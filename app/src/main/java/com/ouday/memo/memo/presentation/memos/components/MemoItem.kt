@@ -17,10 +17,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import com.ouday.memo.core.util.TestTags
 import com.ouday.memo.memo.domain.model.Memo
 
 @Composable
@@ -32,6 +34,7 @@ fun MemoItem(
     onDeleteClick: () -> Unit
 ) {
     Box(
+        modifier = modifier.testTag(TestTags.ROW_ITEM)
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {

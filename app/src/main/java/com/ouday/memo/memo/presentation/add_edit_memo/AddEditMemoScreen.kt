@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ouday.memo.core.util.TestTags
 import com.ouday.memo.memo.domain.model.Memo
 import com.ouday.memo.memo.presentation.add_edit_memo.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
@@ -122,6 +123,7 @@ fun AddEditMemoScreen(
                 },
                 textStyle = MaterialTheme.typography.h5,
                 singleLine = true,
+                testTag = TestTags.TEXT_FIELD_TITLE
             ) {
 
             }
@@ -135,6 +137,7 @@ fun AddEditMemoScreen(
                     viewModel.memoContent.value = it
                 },
                 textStyle = MaterialTheme.typography.body1,
+                testTag = TestTags.TEXT_FIELD_CONTENT
             ) {
             }
 
