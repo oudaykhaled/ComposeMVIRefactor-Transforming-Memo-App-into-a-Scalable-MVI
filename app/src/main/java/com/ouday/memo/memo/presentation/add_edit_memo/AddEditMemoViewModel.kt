@@ -40,20 +40,20 @@ class AddEditMemoViewModel @Inject constructor(
     private var currentMemoId: Int? = null
 
     init {
-        savedStateHandle.get<Int>("MemoId")?.let { MemoId ->
-            if(MemoId != -1) {
+        savedStateHandle.get<Int>("memoId")?.let { memoId ->
+            if(memoId != -1) {
                 viewModelScope.launch {
-                    memoUseCases.getMemo(MemoId)?.also { Memo ->
-                        currentMemoId = Memo.id
+                    memoUseCases.getMemo(memoId)?.also { memo ->
+                        currentMemoId = memo.id
                         _memoTitle.value = memoTitle.value.copy(
-                            text = Memo.title,
+                            text = memo.title,
                             isHintVisible = false
                         )
                         _memoContent.value = _memoContent.value.copy(
-                            text = Memo.content,
+                            text = memo.content,
                             isHintVisible = false
                         )
-                        _memoColor.value = Memo.color
+                        _memoColor.value = memo.color
                     }
                 }
             }

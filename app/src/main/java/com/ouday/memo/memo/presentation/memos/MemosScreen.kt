@@ -116,7 +116,7 @@ fun MemosScreen(
                             .clickable {
                                 navController.navigate(
                                     Screen.AddEditMemoScreen.route +
-                                            "?MemoId=${memo.id}&MemoColor=${memo.color}"
+                                            "?memoId=${memo.id}&memoColor=${memo.color}"
                                 )
                             },
                         onDeleteClick = {
