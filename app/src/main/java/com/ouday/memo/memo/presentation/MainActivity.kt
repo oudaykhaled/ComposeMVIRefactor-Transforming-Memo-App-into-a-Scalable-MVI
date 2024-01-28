@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                             val color = it.arguments?.getInt("memoColor") ?: -1
                             AddEditMemoScreen(
                                 navController = navController,
-                                memoColor = color
+//                                memoColor = color
                             )
                         }
                     }

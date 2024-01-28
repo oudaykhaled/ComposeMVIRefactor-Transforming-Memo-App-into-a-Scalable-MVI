@@ -45,17 +45,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddEditMemoScreen(
     navController: NavController,
-    memoColor: Int,
     viewModel: AddEditMemoViewModel = hiltViewModel()
 ) {
-    val titleState = viewModel.memoTitle.value
-    val contentState = viewModel.memoContent.value
+    val titleState = viewModel.state.value.title
+    val contentState = viewModel.state.value.content
 
     val scaffoldState = rememberScaffoldState()
 
     val memoBackgroundAnimatable = remember {
         Animatable(
-            Color(if (memoColor != -1) memoColor else viewModel.memoColor.value)
+            Color(viewModel.state.value.memoColor)
         )
     }
     val scope = rememberCoroutineScope()
@@ -81,7 +80,7 @@ fun AddEditMemoScreen(
                 onClick = {
                     viewModel.onEvent(AddEditMemoEvent.SaveMemo)
                 },
-                backgroundColor = MaterialTheme.colors.primary
+                backgroundColor = Color(viewModel.state.value.memoColor)
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
             }
@@ -91,7 +90,7 @@ fun AddEditMemoScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(memoBackgroundAnimatable.value)
+                .background(Color(viewModel.state.value.memoColor))
                 .padding(16.dp)
         ) {
             Row(
@@ -110,7 +109,7 @@ fun AddEditMemoScreen(
                             .background(color)
                             .border(
                                 width = 3.dp,
-                                color = if (viewModel.memoColor.value == colorInt) {
+                                color = if (viewModel.state.value.memoColor == colorInt) {
                                     Color.Black
                                 } else Color.Transparent,
                                 shape = CircleShape

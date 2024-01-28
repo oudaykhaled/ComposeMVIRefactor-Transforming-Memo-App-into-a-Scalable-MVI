@@ -2,7 +2,6 @@ package com.ouday.memo.memo.presentation.add_edit_memo
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,18 +20,8 @@ class AddEditMemoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _memoTitle = mutableStateOf(MemoTextFieldState(
-        hint = "Enter title..."
-    ))
-    val memoTitle: State<MemoTextFieldState> = _memoTitle
-
-    private val _memoContent = mutableStateOf(MemoTextFieldState(
-        hint = "Enter some content"
-    ))
-    val memoContent: State<MemoTextFieldState> = _memoContent
-
-    private val _memoColor = mutableStateOf(Memo.memoColors.random().toArgb())
-    val memoColor: State<Int> = _memoColor
+    private val _state = mutableStateOf(AddEditMemoState())
+    val state: State<AddEditMemoState> = _state
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -45,15 +34,17 @@ class AddEditMemoViewModel @Inject constructor(
                 viewModelScope.launch {
                     memoUseCases.getMemo(memoId)?.also { memo ->
                         currentMemoId = memo.id
-                        _memoTitle.value = memoTitle.value.copy(
-                            text = memo.title,
-                            isHintVisible = false
+                        _state.value = _state.value.copy(
+                            title = _state.value.title.copy(
+                                text = memo.title,
+                                isHintVisible = false
+                            ),
+                            content = _state.value.content.copy(
+                                text = memo.content,
+                                isHintVisible = false
+                            ),
+                            memoColor = memo.color
                         )
-                        _memoContent.value = _memoContent.value.copy(
-                            text = memo.content,
-                            isHintVisible = false
-                        )
-                        _memoColor.value = memo.color
                     }
                 }
             }
@@ -63,39 +54,49 @@ class AddEditMemoViewModel @Inject constructor(
     fun onEvent(event: AddEditMemoEvent) {
         when(event) {
             is AddEditMemoEvent.EnteredTitle -> {
-                _memoTitle.value = memoTitle.value.copy(
-                    text = event.value
+                _state.value = _state.value.copy(
+                    title = _state.value.title.copy(
+                        text = event.value
+                    )
                 )
             }
             is AddEditMemoEvent.ChangeTitleFocus -> {
-                _memoTitle.value = memoTitle.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            memoTitle.value.text.isBlank()
+                _state.value = _state.value.copy(
+                    title = _state.value.title.copy(
+                        isHintVisible = !event.focusState.isFocused &&
+                                _state.value.title.text.isBlank()
+                    )
                 )
             }
             is AddEditMemoEvent.EnteredContent -> {
-                _memoContent.value = _memoContent.value.copy(
-                    text = event.value
+                _state.value = _state.value.copy(
+                    content = _state.value.content.copy(
+                        text = event.value
+                    )
                 )
             }
             is AddEditMemoEvent.ChangeContentFocus -> {
-                _memoContent.value = _memoContent.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            _memoContent.value.text.isBlank()
+                _state.value = _state.value.copy(
+                    content = _state.value.content.copy(
+                        isHintVisible = !event.focusState.isFocused &&
+                                _state.value.content.text.isBlank()
+                    )
                 )
             }
             is AddEditMemoEvent.ChangeColor -> {
-                _memoColor.value = event.color
+                _state.value = _state.value.copy(
+                    memoColor = event.color
+                )
             }
             is AddEditMemoEvent.SaveMemo -> {
                 viewModelScope.launch {
                     try {
                         memoUseCases.addMemo(
                             Memo(
-                                title = memoTitle.value.text,
-                                content = memoContent.value.text,
+                                title = _state.value.title.text,
+                                content = _state.value.content.text,
                                 timestamp = System.currentTimeMillis(),
-                                color = memoColor.value,
+                                color = _state.value.memoColor,
                                 id = currentMemoId
                             )
                         )
