@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ouday.memo.memo.domain.util.MemoOrder
 import com.ouday.memo.memo.domain.util.OrderType
-import com.ouday.memo.memo.presentation.Memos.components.DefaultRadioButton
 
 @Composable
 fun OrderSection(
