@@ -1,4 +1,4 @@
-package com.ouday.memo.presentation
+package com.ouday.memo.memo.presentation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.test.*
@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ouday.memo.core.util.TestTags
 import com.ouday.memo.di.AppModule
-import com.ouday.memo.memo.presentation.MainActivity
 import com.ouday.memo.memo.presentation.add_edit_memo.AddEditMemoScreen
 import com.ouday.memo.memo.presentation.memos.MemosScreen
 import com.ouday.memo.memo.presentation.util.Screen
@@ -48,25 +47,26 @@ class MemosEndToEndTest {
                     }
                     composable(
                         route = Screen.AddEditMemoScreen.route +
-                                "?memoId={memoId}&memoColor={memoColor}",
+                                "?MemoId={MemoId}&MemoColor={MemoColor}",
                         arguments = listOf(
                             navArgument(
-                                name = "memoId"
+                                name = "MemoId"
                             ) {
                                 type = NavType.IntType
                                 defaultValue = -1
                             },
                             navArgument(
-                                name = "memoColor"
+                                name = "MemoColor"
                             ) {
                                 type = NavType.IntType
                                 defaultValue = -1
                             },
                         )
                     ) {
-                        val color = it.arguments?.getInt("memoColor") ?: -1
+                        val color = it.arguments?.getInt("MemoColor") ?: -1
                         AddEditMemoScreen(
-                            navController = navController
+                            navController = navController,
+                            memoColor = color
                         )
                     }
                 }
@@ -76,7 +76,7 @@ class MemosEndToEndTest {
 
     @Test
     fun saveNewMemo_editAfterwards() {
-        // Click on FAB to get to add memo screen
+        // Click on FAB to get to add Memo screen
         composeRule.onNodeWithContentDescription("Add").performClick()
 
         // Enter texts in title and content text fields
@@ -89,24 +89,33 @@ class MemosEndToEndTest {
         // Save the new
         composeRule.onNodeWithContentDescription("Save").performClick()
 
-        // Make sure there is a memo in the list with our title and content
+        // Make sure there is a Memo in the list with our title and content
         composeRule.onNodeWithText("test-title").assertIsDisplayed()
-        // Click on memo to edit it
+        // Click on Memo to edit it
         composeRule.onNodeWithText("test-title").performClick()
 
+        // Make sure title and content text fields contain Memo title and content
+        composeRule
+            .onNodeWithTag(TestTags.TEXT_FIELD_TITLE)
+            .assertTextEquals("test-title")
+        composeRule
+            .onNodeWithTag(TestTags.TEXT_FIELD_CONTENT)
+            .assertTextEquals("test-content")
+        // Add the text "2" to the title text field
         composeRule
             .onNodeWithTag(TestTags.TEXT_FIELD_TITLE)
             .performTextInput("2")
-
-        // Update the memo
+        // Update the Memo
         composeRule.onNodeWithContentDescription("Save").performClick()
 
+        // Make sure the update was applied to the list
+        composeRule.onNodeWithText("test-title2").assertIsDisplayed()
     }
 
     @Test
     fun saveNewMemos_orderByTitleDescending() {
         for(i in 1..3) {
-            // Click on FAB to get to add memo screen
+            // Click on FAB to get to add Memo screen
             composeRule.onNodeWithContentDescription("Add").performClick()
 
             // Enter texts in title and content text fields

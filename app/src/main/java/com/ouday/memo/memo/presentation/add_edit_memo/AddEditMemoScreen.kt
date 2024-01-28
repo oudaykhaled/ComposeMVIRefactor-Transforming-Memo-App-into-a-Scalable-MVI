@@ -5,11 +5,25 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -31,26 +45,32 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddEditMemoScreen(
     navController: NavController,
+    memoColor: Int,
     viewModel: AddEditMemoViewModel = hiltViewModel()
 ) {
+    val titleState = viewModel.memoTitle.value
+    val contentState = viewModel.memoContent.value
 
     val scaffoldState = rememberScaffoldState()
 
     val memoBackgroundAnimatable = remember {
         Animatable(
-            Color(viewModel.memoColor.value)
+            Color(if (memoColor != -1) memoColor else viewModel.memoColor.value)
         )
     }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
-        viewModel.saveMemo.collectLatest { success ->
-            if (success) {
-                navController.navigateUp()
-            } else {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = "Failed to save memo!"
-                )
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is AddEditMemoViewModel.UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+                is AddEditMemoViewModel.UiEvent.SaveMemo -> {
+                    navController.navigateUp()
+                }
             }
         }
     }
@@ -59,11 +79,7 @@ fun AddEditMemoScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.saveMemo(
-                        viewModel.memoTitle.value,
-                        viewModel.memoContent.value,
-                        viewModel.memoColor.value
-                    )
+                    viewModel.onEvent(AddEditMemoEvent.SaveMemo)
                 },
                 backgroundColor = MaterialTheme.colors.primary
             ) {
@@ -108,39 +124,41 @@ fun AddEditMemoScreen(
                                         )
                                     )
                                 }
-                                viewModel.memoColor.value = colorInt
+                                viewModel.onEvent(AddEditMemoEvent.ChangeColor(colorInt))
                             }
                     )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
-                text = viewModel.memoTitle.value,
-                hint = "Enter title...",
-                isHintVisible = viewModel.memoTitle.value.isBlank(),
+                text = titleState.text,
+                hint = titleState.hint,
                 onValueChange = {
-                    viewModel.memoTitle.value = it
+                    viewModel.onEvent(AddEditMemoEvent.EnteredTitle(it))
                 },
-                textStyle = MaterialTheme.typography.h5,
+                onFocusChange = {
+                    viewModel.onEvent(AddEditMemoEvent.ChangeTitleFocus(it))
+                },
+                isHintVisible = titleState.isHintVisible,
                 singleLine = true,
+                textStyle = MaterialTheme.typography.h5,
                 testTag = TestTags.TEXT_FIELD_TITLE
-            ) {
-
-            }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
-                text = viewModel.memoContent.value,
-                hint = "Enter some content",
-                isHintVisible = viewModel.memoContent.value.isBlank(),
-                modifier = Modifier.fillMaxHeight(),
+                text = contentState.text,
+                hint = contentState.hint,
                 onValueChange = {
-                    viewModel.memoContent.value = it
+                    viewModel.onEvent(AddEditMemoEvent.EnteredContent(it))
                 },
+                onFocusChange = {
+                    viewModel.onEvent(AddEditMemoEvent.ChangeContentFocus(it))
+                },
+                isHintVisible = contentState.isHintVisible,
                 textStyle = MaterialTheme.typography.body1,
+                modifier = Modifier.fillMaxHeight(),
                 testTag = TestTags.TEXT_FIELD_CONTENT
-            ) {
-            }
-
+            )
         }
     }
 }

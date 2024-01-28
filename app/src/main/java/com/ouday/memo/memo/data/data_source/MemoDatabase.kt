@@ -13,6 +13,6 @@ abstract class MemoDatabase: RoomDatabase() {
     abstract val memoDao: MemoDao
 
     companion object {
-        const val DATABASE_NAME = "memos_db"
+        const val DATABASE_NAME = "Memos_db"
     }
 }

@@ -37,25 +37,26 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             route = Screen.AddEditMemoScreen.route +
-                                    "?memoId={memoId}&memoColor={memoColor}",
+                                    "?MemoId={MemoId}&MemoColor={MemoColor}",
                             arguments = listOf(
                                 navArgument(
-                                    name = "memoId"
+                                    name = "MemoId"
                                 ) {
                                     type = NavType.IntType
                                     defaultValue = -1
                                 },
                                 navArgument(
-                                    name = "memoColor"
+                                    name = "MemoColor"
                                 ) {
                                     type = NavType.IntType
                                     defaultValue = -1
                                 },
                             )
                         ) {
-                            val color = it.arguments?.getInt("memoColor") ?: -1
+                            val color = it.arguments?.getInt("MemoColor") ?: -1
                             AddEditMemoScreen(
-                                navController = navController
+                                navController = navController,
+                                memoColor = color
                             )
                         }
                     }

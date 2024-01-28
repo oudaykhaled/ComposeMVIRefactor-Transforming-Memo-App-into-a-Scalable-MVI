@@ -1,7 +1,12 @@
 package com.ouday.memo.memo.presentation.memos.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -34,7 +39,8 @@ fun MemoItem(
     onDeleteClick: () -> Unit
 ) {
     Box(
-        modifier = modifier.testTag(TestTags.ROW_ITEM)
+        modifier = modifier
+            .testTag(TestTags.ROW_ITEM)
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {
@@ -89,7 +95,7 @@ fun MemoItem(
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Delete memo",
+                contentDescription = "Delete Memo",
                 tint = MaterialTheme.colors.onSurface
             )
         }

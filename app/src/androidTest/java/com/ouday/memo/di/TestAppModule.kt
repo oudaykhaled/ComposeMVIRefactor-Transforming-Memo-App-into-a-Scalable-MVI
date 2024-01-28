@@ -33,8 +33,14 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun provideMemoUseCases(repository: MemoRepository): MemoUseCase {
-        return MemoUseCaseImpl(repository)
+    fun provideMemoUseCases(repository: MemoRepository): MemoUseCases {
+        return MemoUseCases(
+            getMemos = GetMemos(repository),
+            deleteMemo = DeleteMemo(repository),
+            addMemo = AddMemo(repository),
+            getMemo = GetMemo(repository)
+        )
     }
 
+    
 }

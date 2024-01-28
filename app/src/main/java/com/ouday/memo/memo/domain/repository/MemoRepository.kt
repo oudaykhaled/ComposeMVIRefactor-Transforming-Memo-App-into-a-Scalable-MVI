@@ -9,7 +9,7 @@ interface MemoRepository {
 
     suspend fun getMemoById(id: Int): Memo?
 
-    suspend fun insertMemo(memo: Memo)
+    suspend fun insertMemo(Memo: Memo)
 
-    suspend fun deleteMemo(memo: Memo)
+    suspend fun deleteMemo(Memo: Memo)
 }

@@ -1,4 +1,4 @@
-package com.ouday.memo.memo.presentation.memos.components
+package com.ouday.memo.memo.presentation.Memos.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

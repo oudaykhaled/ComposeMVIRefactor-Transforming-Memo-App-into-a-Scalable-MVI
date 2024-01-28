@@ -1,27 +1,27 @@
 package com.ouday.memo.memo.data.repository
 
-import com.ouday.memo.memo.data.data_source.MemoDao
 import com.ouday.memo.memo.domain.model.Memo
 import com.ouday.memo.memo.domain.repository.MemoRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-class MemoRepositoryImpl(
-    private val dao: MemoDao
-) : MemoRepository {
+class FakeMemoRepository : MemoRepository {
+
+    private val memos = mutableListOf<Memo>()
 
     override fun getMemos(): Flow<List<Memo>> {
-        return dao.getMemos()
+        return flow { emit(memos) }
     }
 
     override suspend fun getMemoById(id: Int): Memo? {
-        return dao.getMemoById(id)
+        return memos.find { it.id == id }
     }
 
     override suspend fun insertMemo(Memo: Memo) {
-        dao.insertMemo(Memo)
+        memos.add(Memo)
     }
 
     override suspend fun deleteMemo(Memo: Memo) {
-        dao.deleteMemo(Memo)
+        memos.remove(Memo)
     }
 }
