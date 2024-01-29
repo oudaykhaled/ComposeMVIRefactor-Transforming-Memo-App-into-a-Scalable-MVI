@@ -32,11 +32,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ouday.memo.core.util.TestTags
+import com.ouday.memo.memo.domain.model.Memo
+import com.ouday.memo.memo.domain.util.MemoOrder
+import com.ouday.memo.memo.domain.util.OrderType
 import com.ouday.memo.memo.presentation.memos.components.MemoItem
 import com.ouday.memo.memo.presentation.memos.components.OrderSection
 import com.ouday.memo.memo.presentation.util.Screen
@@ -46,9 +51,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun MemosScreen(
     navController: NavController,
-    viewModel: MemosViewModel = hiltViewModel()
+    state: MemosState,
+    event: (MemosEvent) -> Unit
 ) {
-    val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -81,7 +86,7 @@ fun MemosScreen(
                 )
                 IconButton(
                     onClick = {
-                        viewModel.onEvent(MemosEvent.ToggleOrderSection)
+                        event(MemosEvent.ToggleOrderSection)
                     },
                 ) {
                     Icon(
@@ -102,7 +107,7 @@ fun MemosScreen(
                         .testTag(TestTags.FILTER),
                     memoOrder = state.memoOrder,
                     onOrderChange = {
-                        viewModel.onEvent(MemosEvent.Order(it))
+                        event(MemosEvent.Order(it))
                     }
                 )
             }
@@ -120,14 +125,14 @@ fun MemosScreen(
                                 )
                             },
                         onDeleteClick = {
-                            viewModel.onEvent(MemosEvent.DeleteMemo(memo))
+                            event(MemosEvent.DeleteMemo(memo))
                             scope.launch {
                                 val result = scaffoldState.snackbarHostState.showSnackbar(
                                     message = "Memo deleted",
                                     actionLabel = "Undo"
                                 )
                                 if(result == SnackbarResult.ActionPerformed) {
-                                    viewModel.onEvent(MemosEvent.RestoreMemo)
+                                    event(MemosEvent.RestoreMemo)
                                 }
                             }
                         }
@@ -137,4 +142,38 @@ fun MemosScreen(
             }
         }
     }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Preview(showBackground = true)
+@Composable
+fun MemosScreenPreview() {
+    val sampleMemos = listOf(
+        Memo(
+            title = "Sample Memo 1",
+            content = "This is the first sample memo.",
+            timestamp = System.currentTimeMillis(),
+            color = Memo.memoColors.random().toArgb(),
+            id = 1
+        ),
+        Memo(
+            title = "Sample Memo 2",
+            content = "This is the second sample memo.",
+            timestamp = System.currentTimeMillis(),
+            color = Memo.memoColors.random().toArgb(),
+            id = 2
+        )
+    )
+
+    val sampleState = MemosState(
+        memos = sampleMemos,
+        memoOrder = MemoOrder.Date(OrderType.Descending),
+        isOrderSectionVisible = true
+    )
+
+    MemosScreen(
+        navController = rememberNavController(),
+        state = sampleState,
+        event = { }
+    )
 }

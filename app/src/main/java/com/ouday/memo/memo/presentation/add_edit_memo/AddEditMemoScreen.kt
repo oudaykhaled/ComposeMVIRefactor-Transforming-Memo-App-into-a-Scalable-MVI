@@ -33,34 +33,39 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ouday.memo.core.util.TestTags
 import com.ouday.memo.memo.domain.model.Memo
 import com.ouday.memo.memo.presentation.add_edit_memo.components.TransparentHintTextField
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 @Composable
 fun AddEditMemoScreen(
     navController: NavController,
-    viewModel: AddEditMemoViewModel = hiltViewModel()
+    state: AddEditMemoState,
+    event: (event: AddEditMemoEvent) -> Unit,
+    eventFlow: Flow<AddEditMemoViewModel.UiEvent>
 ) {
-    val titleState = viewModel.state.value.title
-    val contentState = viewModel.state.value.content
+    val titleState = state.title
+    val contentState = state.content
 
     val scaffoldState = rememberScaffoldState()
 
     val memoBackgroundAnimatable = remember {
         Animatable(
-            Color(viewModel.state.value.memoColor)
+            Color(state.memoColor)
         )
     }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
+        eventFlow.collectLatest { event ->
             when(event) {
                 is AddEditMemoViewModel.UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -78,9 +83,9 @@ fun AddEditMemoScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.onEvent(AddEditMemoEvent.SaveMemo)
+                    event(AddEditMemoEvent.SaveMemo)
                 },
-                backgroundColor = Color(viewModel.state.value.memoColor)
+                backgroundColor = Color(state.memoColor)
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
             }
@@ -90,7 +95,7 @@ fun AddEditMemoScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(viewModel.state.value.memoColor))
+                .background(Color(state.memoColor))
                 .padding(16.dp)
         ) {
             Row(
@@ -109,7 +114,7 @@ fun AddEditMemoScreen(
                             .background(color)
                             .border(
                                 width = 3.dp,
-                                color = if (viewModel.state.value.memoColor == colorInt) {
+                                color = if (state.memoColor == colorInt) {
                                     Color.Black
                                 } else Color.Transparent,
                                 shape = CircleShape
@@ -123,7 +128,7 @@ fun AddEditMemoScreen(
                                         )
                                     )
                                 }
-                                viewModel.onEvent(AddEditMemoEvent.ChangeColor(colorInt))
+                                event(AddEditMemoEvent.ChangeColor(colorInt))
                             }
                     )
                 }
@@ -133,10 +138,10 @@ fun AddEditMemoScreen(
                 text = titleState.text,
                 hint = titleState.hint,
                 onValueChange = {
-                    viewModel.onEvent(AddEditMemoEvent.EnteredTitle(it))
+                    event(AddEditMemoEvent.EnteredTitle(it))
                 },
                 onFocusChange = {
-                    viewModel.onEvent(AddEditMemoEvent.ChangeTitleFocus(it))
+                    event(AddEditMemoEvent.ChangeTitleFocus(it))
                 },
                 isHintVisible = titleState.isHintVisible,
                 singleLine = true,
@@ -148,10 +153,10 @@ fun AddEditMemoScreen(
                 text = contentState.text,
                 hint = contentState.hint,
                 onValueChange = {
-                    viewModel.onEvent(AddEditMemoEvent.EnteredContent(it))
+                    event(AddEditMemoEvent.EnteredContent(it))
                 },
                 onFocusChange = {
-                    viewModel.onEvent(AddEditMemoEvent.ChangeContentFocus(it))
+                    event(AddEditMemoEvent.ChangeContentFocus(it))
                 },
                 isHintVisible = contentState.isHintVisible,
                 textStyle = MaterialTheme.typography.body1,
@@ -160,4 +165,49 @@ fun AddEditMemoScreen(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun `Memo screen with hint`() {
+    val sampleState = AddEditMemoState(
+        title = MemoTextFieldState(
+            text = "",
+            hint = "Enter title..."
+        ),
+        content = MemoTextFieldState(
+            text = "",
+            hint = "Enter some content"
+        ),
+        memoColor = Memo.memoColors.random().toArgb()
+    )
+
+    AddEditMemoScreen(
+        navController = rememberNavController(),
+        state = sampleState,
+        event = {  },
+        eventFlow = flow {  }
+    )
+}
+@Preview(showBackground = true)
+@Composable
+fun `Memo screen with no hint`() {
+    val sampleState = AddEditMemoState(
+        title = MemoTextFieldState(
+            text = "Memo title example",
+            hint = ""
+        ),
+        content = MemoTextFieldState(
+            text = "Memo content example",
+            hint = ""
+        ),
+        memoColor = Memo.memoColors.random().toArgb()
+    )
+
+    AddEditMemoScreen(
+        navController = rememberNavController(),
+        state = sampleState,
+        event = {  },
+        eventFlow = flow {  }
+    )
 }

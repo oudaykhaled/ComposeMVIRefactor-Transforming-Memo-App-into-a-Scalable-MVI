@@ -61,13 +61,13 @@ class MemosViewModel @Inject constructor(
         }
     }
 
-    private fun getMemos(MemoOrder: MemoOrder) {
+    private fun getMemos(memoOrder: MemoOrder) {
         getMemosJob?.cancel()
-        getMemosJob = memoUseCases.getMemos(MemoOrder)
+        getMemosJob = memoUseCases.getMemos(memoOrder)
             .onEach { Memos ->
                 _state.value = state.value.copy(
                     memos = Memos,
-                    memoOrder = MemoOrder
+                    memoOrder = memoOrder
                 )
             }
             .launchIn(viewModelScope)

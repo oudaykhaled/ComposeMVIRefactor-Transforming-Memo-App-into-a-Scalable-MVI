@@ -6,13 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ouday.memo.memo.presentation.add_edit_memo.AddEditMemoScreen
+import com.ouday.memo.memo.presentation.add_edit_memo.AddEditMemoViewModel
 import com.ouday.memo.memo.presentation.memos.MemosScreen
+import com.ouday.memo.memo.presentation.memos.MemosViewModel
 import com.ouday.memo.memo.presentation.util.Screen
 import com.ouday.memo.ui.theme.memoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +36,12 @@ class MainActivity : ComponentActivity() {
                         startDestination = Screen.MemosScreen.route
                     ) {
                         composable(route = Screen.MemosScreen.route) {
-                            MemosScreen(navController = navController)
+                            val memosViewModel: MemosViewModel = hiltViewModel()
+                            MemosScreen(
+                                navController = navController,
+                                state = memosViewModel.state.value,
+                                event = memosViewModel::onEvent
+                            )
                         }
                         composable(
                             route = Screen.AddEditMemoScreen.route +
@@ -53,10 +61,12 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
                         ) {
-                            val color = it.arguments?.getInt("memoColor") ?: -1
+                            val addEditViewModel: AddEditMemoViewModel = hiltViewModel()
                             AddEditMemoScreen(
                                 navController = navController,
-//                                memoColor = color
+                                state = addEditViewModel.state.value,
+                                event = addEditViewModel::onEvent,
+                                eventFlow = addEditViewModel.eventFlow
                             )
                         }
                     }

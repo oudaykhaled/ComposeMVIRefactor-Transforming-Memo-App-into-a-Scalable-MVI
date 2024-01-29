@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,7 +45,12 @@ class MemosScreenTest {
                     startDestination = Screen.MemosScreen.route
                 ) {
                     composable(route = Screen.MemosScreen.route) {
-                        MemosScreen(navController = navController)
+                        val memosViewModel: MemosViewModel = hiltViewModel()
+                        MemosScreen(
+                            navController = navController,
+                            state = memosViewModel.state.value,
+                            event = memosViewModel::onEvent
+                        )
                     }
                 }
             }
