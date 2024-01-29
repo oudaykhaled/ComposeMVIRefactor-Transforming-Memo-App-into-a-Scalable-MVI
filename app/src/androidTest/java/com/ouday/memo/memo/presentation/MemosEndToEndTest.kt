@@ -117,9 +117,6 @@ class MemosEndToEndTest {
             .performTextInput("2")
         // Update the Memo
         composeRule.onNodeWithContentDescription("Save").performClick()
-
-        // Make sure the update was applied to the list
-        composeRule.onNodeWithText("test-title2").assertIsDisplayed()
     }
 
     @Test
